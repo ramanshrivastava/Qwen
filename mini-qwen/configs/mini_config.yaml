@@ -1,0 +1,72 @@
+# Mini-Qwen Configuration
+# ~50M parameters, suitable for single GPU or CPU training
+
+model:
+  vocab_size: 10000  # Will be set by tokenizer
+  hidden_dim: 512
+  n_layers: 8
+  n_heads: 8
+  max_seq_len: 512
+  dropout: 0.1
+
+  # MLP config (SwiGLU)
+  intermediate_dim: null  # Auto: int(hidden_dim * 8/3) ≈ 1365
+
+  # RoPE config
+  rope_theta: 10000.0
+
+  # Normalization
+  norm_eps: 1e-6
+
+  # Embeddings
+  tie_embeddings: false  # Untied (like Qwen)
+
+training:
+  # Data
+  train_data: "examples/datasets/shakespeare.txt"
+  val_data: null  # Use same as train if null
+  batch_size: 32
+  num_workers: 4
+
+  # Optimization
+  learning_rate: 3.0e-4
+  weight_decay: 0.1
+  betas: [0.9, 0.95]
+  eps: 1.0e-8
+  grad_clip: 1.0
+
+  # Schedule
+  max_steps: 10000
+  warmup_steps: 500
+  lr_schedule: "cosine"  # cosine, linear, constant
+
+  # Mixed precision
+  use_amp: false  # Set to true for faster training with BF16/FP16
+  amp_dtype: "bfloat16"  # bfloat16 or float16
+
+  # Gradient accumulation
+  gradient_accumulation_steps: 1
+
+  # Checkpointing
+  save_every: 1000
+  eval_every: 500
+  log_every: 10
+
+  # Output
+  output_dir: "checkpoints/mini"
+  experiment_name: "mini-qwen-shakespeare"
+
+  # Logging
+  use_wandb: false
+  use_tensorboard: true
+
+generation:
+  max_length: 100
+  temperature: 0.8
+  top_k: 50
+  top_p: 0.9
+  repetition_penalty: 1.1
+  use_kv_cache: true
+
+# Seed for reproducibility
+seed: 42
